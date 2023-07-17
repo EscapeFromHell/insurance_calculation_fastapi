@@ -1,0 +1,2 @@
+# insurance_calculation_fastapi
+Тестовое задание
