@@ -1,0 +1,34 @@
+version: "3"
+services:
+  insurance_calculation_fastapi-db:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    volumes:
+      - app-db-data:/var/lib/postgresql/data/pgdata
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_SERVER=insurance_calculation_fastapi-db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=insurance_calculation_fastapi
+    restart: always
+
+  insurance_calculation_fastapi:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - insurance_calculation_fastapi-db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/src
+    environment:
+      - DATABASE_DSN=postgresql://postgres:password@insurance_calculation_fastapi-db:5432/insurance_calculation_fastapi
+      - BACKEND_CORS_ORIGINS=["http://localhost:3000","http://localhost:8000"]
+    command: sh -c "uvicorn --host 0.0.0.0 --port 8000 src.main:app"
+    restart: always
+
+volumes:
+  app-db-data:
